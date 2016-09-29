@@ -24,3 +24,4 @@ nbactions.xml
 /model-logic/derby.log
 /model-api/derby.log
 
+/model-web/
