@@ -13,15 +13,15 @@ hs_err_pid*
 
 .tmp/
 /target/
-/model-logic/target/
-/model-api/target/
+/company-logic/target/
+/company-api/target/
 
 #NetBeans
 nbactions.xml
-/model-api/nb-configuration.xml
+/company-api/nb-configuration.xml
 
 #Tests
-/model-logic/derby.log
-/model-api/derby.log
+/company-logic/derby.log
+/company-api/derby.log
 
-/model-web/
+/company-web/
