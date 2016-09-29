@@ -95,6 +95,7 @@ public class EmployeeResource {
      * 
      */
     @GET
+    @Path("/byName")
     public EmployeeDetailDTO getEmployeebByName(@QueryParam("name") String name) {
         return new EmployeeDetailDTO(employeeLogic.getEmployeeByName(name));
     }

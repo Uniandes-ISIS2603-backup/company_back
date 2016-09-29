@@ -33,15 +33,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import co.edu.uniandes.csw.company.api.ICompanyLogic;
 import co.edu.uniandes.csw.company.dtos.CompanyDetailDTO;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import java.util.ArrayList;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
+
 
 
 @Path("/companies")
@@ -51,12 +49,7 @@ public class CompanyResource {
 
     @Inject
     private ICompanyLogic companyLogic;
-    @Context
-    private HttpServletResponse response;
-    @QueryParam("page")
-    private Integer page;
-    @QueryParam("limit")
-    private Integer maxRecords;
+ 
 
     /**
      * Convierte una lista de CompanyEntity a una lista de CompanyDetailDTO.
