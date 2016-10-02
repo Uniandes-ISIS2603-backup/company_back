@@ -74,7 +74,7 @@ public class CompanyPersistenceTest {
      * Configuración inicial de la prueba.
      */
     @Before
-    public void configTest() {
+    public void setUp() {
         try {
             utx.begin();
             em.joinTransaction();
@@ -120,12 +120,12 @@ public class CompanyPersistenceTest {
     public void createCompanyTest() {
         PodamFactory factory = new PodamFactoryImpl();
         CompanyEntity newEntity = factory.manufacturePojo(CompanyEntity.class);
+
         CompanyEntity result = companyPersistence.create(newEntity);
 
         Assert.assertNotNull(result);
-
         CompanyEntity entity = em.find(CompanyEntity.class, result.getId());
-
+        Assert.assertNotNull(entity);
         Assert.assertEquals(newEntity.getName(), entity.getName());
     }
 
@@ -181,6 +181,10 @@ public class CompanyPersistenceTest {
         CompanyEntity deleted = em.find(CompanyEntity.class, entity.getId());
         Assert.assertNull(deleted);
     }
+
+    
+    
+    
 
     /**
      * Prueba para actualizar un Company.

@@ -104,7 +104,7 @@ public class CompanyLogicTest {
      * 
      */
     @Before
-    public void configTest() {
+    public void setUp() {
         try {
             utx.begin();
             clearData();

@@ -109,7 +109,7 @@ public class EmployeeLogicTest {
      * 
      */
     @Before
-    public void configTest() {
+    public void setUp() {
         try {
             utx.begin();
             clearData();

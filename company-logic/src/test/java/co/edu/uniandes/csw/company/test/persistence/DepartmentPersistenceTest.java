@@ -86,7 +86,7 @@ public class DepartmentPersistenceTest {
      *
      */
     @Before
-    public void configTest() {
+    public void setUp() {
         try {
             utx.begin();
             em.joinTransaction();

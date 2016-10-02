@@ -118,7 +118,7 @@ public class DepartmentLogicTest {
      *
      */
     @Before
-    public void configTest() {
+    public void setUp() {
         try {
             utx.begin();
             clearData();
