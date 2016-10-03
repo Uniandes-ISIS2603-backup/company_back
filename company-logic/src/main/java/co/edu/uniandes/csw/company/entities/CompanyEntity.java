@@ -41,9 +41,7 @@ public class CompanyEntity extends BaseEntity implements Serializable {
 
     /**
      * Obtiene la colección de department.
-     *
-     * @return colección department.
-     * 
+     * @return colección department. 
      */
     public List<DepartmentEntity> getDepartments() {
         return departments;
@@ -51,9 +49,7 @@ public class CompanyEntity extends BaseEntity implements Serializable {
 
     /**
      * Establece el valor de la colección de department.
-     *
-     * @param departments nuevo valor de la colección.
-     * 
+     * @param departments nuevo valor de la colección. 
      */
     public void setDepartments(List<DepartmentEntity> departments) {
         this.departments = departments;
