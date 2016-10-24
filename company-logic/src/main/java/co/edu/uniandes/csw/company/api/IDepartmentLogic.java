@@ -39,4 +39,5 @@ public interface IDepartmentLogic {
     public EmployeeEntity addEmployee(Long departmentId, Long employeesId);
     public List<EmployeeEntity> replaceEmployees(Long departmentId, List<EmployeeEntity> list);
     public void removeEmployee(Long departmentId, Long employeesId);
+
 }

@@ -39,8 +39,7 @@ import co.edu.uniandes.csw.company.dtos.CompanyDetailDTO;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import java.util.ArrayList;
 import javax.inject.Inject;
-
-
+import javax.ws.rs.QueryParam;
 
 @Path("/companies")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -49,7 +48,6 @@ public class CompanyResource {
 
     @Inject
     private ICompanyLogic companyLogic;
- 
 
     /**
      * Convierte una lista de CompanyEntity a una lista de CompanyDetailDTO.
@@ -93,6 +91,20 @@ public class CompanyResource {
     }
 
     /**
+     * Obtiene los datos de una instancia de Company a partir de su ID
+     *
+     * @param id Identificador de la instancia a consultar
+     * @return Instancia de CompanyDetailDTO con los datos del Company
+     * consultado
+     *
+     */
+    @GET
+    @Path("/name")
+    public CompanyDetailDTO getCompanyByName(@QueryParam("name") String name) {
+        return new CompanyDetailDTO(companyLogic.getCompanyByName(name));
+    }
+
+    /**
      * Se encarga de crear un Company en la base de datos
      *
      * @param dto Objeto de CompanyDetailDTO con los datos nuevos
@@ -115,10 +127,10 @@ public class CompanyResource {
     @PUT
     @Path("{id: \\d+}")
     public CompanyDetailDTO updateCompany(@PathParam("id") Long id, CompanyDetailDTO dto) {
-        CompanyEntity entity = dto.toEntity();
-        entity.setId(id);
-        CompanyEntity oldEntity = companyLogic.getCompany(id);
-        return new CompanyDetailDTO(companyLogic.updateCompany(entity));
+      CompanyEntity oldEntity = companyLogic.getCompany(id);
+        dto.setId(id);
+        oldEntity = dto.toEntity();
+        return new CompanyDetailDTO(companyLogic.updateCompany(oldEntity));
     }
 
     /**
@@ -133,4 +145,9 @@ public class CompanyResource {
         companyLogic.deleteCompany(id);
     }
 
+    @GET
+    @Path("{id: \\d+}/numberofemployees")
+    public Integer getNumberOfEmployeesCompany(@PathParam("id") Long id) {
+        return companyLogic.getNumberOfEmployeesCompany(id);
+    }
 }

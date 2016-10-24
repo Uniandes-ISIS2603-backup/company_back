@@ -67,7 +67,7 @@ public class CompanyTest {
     private final int Ok = Status.OK.getStatusCode();
     private final int Created = Status.CREATED.getStatusCode();
     private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
-    private final String companyPath = "companys";
+    private final String companyPath = "companies";
     private final static List<CompanyEntity> oraculo = new ArrayList<>();
     private WebTarget target;
     private final String apiPath = "api";
@@ -88,8 +88,7 @@ public class CompanyTest {
                 .addAsResource("META-INF/persistence.xml", "META-INF/persistence.xml")
                 // El archivo beans.xml es necesario para injeccion de dependencias.
                 .addAsWebInfResource(new File("src/main/webapp/WEB-INF/beans.xml"))
-                // El archivo shiro.ini es necesario para injeccion de dependencias
-                .addAsWebInfResource(new File("src/main/webapp/WEB-INF/shiro.ini"))
+               
                 // El archivo web.xml es necesario para el despliegue de los servlets
                 .setWebXML(new File("src/main/webapp/WEB-INF/web.xml"));
     }
@@ -98,7 +97,7 @@ public class CompanyTest {
         return ClientBuilder.newClient().target(deploymentURL.toString()).path(apiPath);
     }
 
-    @PersistenceContext(unitName = "modelPU")
+    @PersistenceContext(unitName = "CompanyPU")
     private EntityManager em;
 
     @Inject

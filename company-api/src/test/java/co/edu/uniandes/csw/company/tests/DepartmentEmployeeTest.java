@@ -76,7 +76,7 @@ public class DepartmentEmployeeTest {
     private final String apiPath = "api";
     private final String username = System.getenv("USERNAME_USER");
     private final String password = System.getenv("PASSWORD_USER");    
-    private final String companyPath = "companys";
+    private final String companyPath = "companies";
     CompanyEntity fatherEntity;
 
     @ArquillianResource
@@ -95,9 +95,7 @@ public class DepartmentEmployeeTest {
                 .addAsResource("META-INF/persistence.xml", "META-INF/persistence.xml")
                 // El archivo beans.xml es necesario para injeccion de dependencias.
                 .addAsWebInfResource(new File("src/main/webapp/WEB-INF/beans.xml"))
-                // El archivo shiro.ini es necesario para injeccion de dependencias
-                .addAsWebInfResource(new File("src/main/webapp/WEB-INF/shiro.ini"))
-                // El archivo web.xml es necesario para el despliegue de los servlets
+                 // El archivo web.xml es necesario para el despliegue de los servlets
                 .setWebXML(new File("src/main/webapp/WEB-INF/web.xml"));
     }
 
@@ -105,7 +103,7 @@ public class DepartmentEmployeeTest {
         return ClientBuilder.newClient().target(deploymentURL.toString()).path(apiPath);
     }
 
-    @PersistenceContext(unitName = "modelPU")
+    @PersistenceContext(unitName = "CompanyPU")
     private EntityManager em;
 
     @Inject

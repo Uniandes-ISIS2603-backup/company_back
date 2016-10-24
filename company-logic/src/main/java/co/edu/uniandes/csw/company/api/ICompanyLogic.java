@@ -27,10 +27,18 @@ import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import java.util.List;
 
 public interface ICompanyLogic {
-   
+
     public List<CompanyEntity> getCompanys();
+
     public CompanyEntity getCompany(Long id);
-    public CompanyEntity createCompany(CompanyEntity entity); 
+
+    public CompanyEntity getCompanyByName(String name);
+
+    public CompanyEntity createCompany(CompanyEntity entity);
+
     public CompanyEntity updateCompany(CompanyEntity entity);
+
     public void deleteCompany(Long id);
+
+    public Integer getNumberOfEmployeesCompany(Long id);
 }

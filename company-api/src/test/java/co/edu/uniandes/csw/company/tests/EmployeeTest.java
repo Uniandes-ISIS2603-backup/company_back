@@ -100,7 +100,7 @@ public class EmployeeTest {
         return ClientBuilder.newClient().target(deploymentURL.toString()).path(apiPath);
     }
 
-    @PersistenceContext(unitName = "modelPU")
+    @PersistenceContext(unitName = "CompanyPU")
     private EntityManager em;
 
     @Inject

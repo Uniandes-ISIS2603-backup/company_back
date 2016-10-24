@@ -61,9 +61,9 @@ public class CompanyPersistence {
     }
 
     public CompanyEntity create(CompanyEntity entity) {
-        LOGGER.info("Creando un company nuevo");
+        LOGGER.info("Creando un company nuevo "+entity.getDepartments().size());
         em.persist(entity);
-        LOGGER.info("Company creado");
+        LOGGER.info("Company creado "+entity.getDepartments().size());
         return entity;
     }
 

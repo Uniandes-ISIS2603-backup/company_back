@@ -24,10 +24,16 @@ SOFTWARE.
 package co.edu.uniandes.csw.company.dtos;
 
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
+import co.edu.uniandes.csw.company.entities.DepartmentEntity;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class CompanyDetailDTO extends CompanyDTO {
+
+    // relación  cero o muchos con departments 
+    private List<DepartmentDTO> departments = new ArrayList<>();
 
     public CompanyDetailDTO() {
         super();
@@ -39,11 +45,14 @@ public class CompanyDetailDTO extends CompanyDTO {
      *
      * @param entity Entidad CompanyEntity desde la cual se va a crear el nuevo
      * objeto.
-     * 
+     *
      */
     public CompanyDetailDTO(CompanyEntity entity) {
         super(entity);
-
+        List<DepartmentEntity> departmentsList = entity.getDepartments();
+        for (DepartmentEntity dept : departmentsList) {
+            this.departments.add(new DepartmentDTO(dept));
+        }
     }
 
     /**
@@ -51,12 +60,30 @@ public class CompanyDetailDTO extends CompanyDTO {
      * atributos de CompanyDTO.
      *
      * @return objeto CompanyEntity.
-     * 
+     *
      */
     @Override
     public CompanyEntity toEntity() {
         CompanyEntity entity = super.toEntity();
+         List<DepartmentDTO> departments = this.getDepartments();
+        for (DepartmentDTO dept : this.departments) {         
+            entity.getDepartments().add(dept.toEntity());
+        }
         return entity;
+    }
+
+    /**
+     * @return the departments
+     */
+    public List<DepartmentDTO> getDepartments() {
+        return departments;
+    }
+
+    /**
+     * @param departments the departments to set
+     */
+    public void setDepartments(List<DepartmentDTO> departments) {
+        this.departments = departments;
     }
 
 }
