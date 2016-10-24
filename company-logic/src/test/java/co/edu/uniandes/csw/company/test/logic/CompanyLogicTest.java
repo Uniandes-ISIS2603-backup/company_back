@@ -30,6 +30,7 @@ import co.edu.uniandes.csw.company.ejbs.DepartmentLogic;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import co.edu.uniandes.csw.company.persistence.CompanyPersistence;
 import co.edu.uniandes.csw.company.entities.DepartmentEntity;
+import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
 import co.edu.uniandes.csw.company.persistence.DepartmentPersistence;
 import java.util.ArrayList;
 import java.util.List;
@@ -154,19 +155,19 @@ public class CompanyLogicTest {
 
         for (int i = 0; i < 3; i++) {
             CompanyEntity entity = factory.manufacturePojo(CompanyEntity.class);
-
+            for (DepartmentEntity d : entity.getDepartments()) {
+                d.setCompany(entity);
+            }
             em.persist(entity);
             data.add(entity);
         }
     }
 
     /**
-     * Prueba para crear un Company
-     *
-     *
+     * Prueba para crear un Company con un nombre que no existe
      */
     @Test
-    public void createCompanyTest() throws NotSupportedException, Exception {
+    public void createCompanyTest1() throws BusinessLogicException {
         CompanyEntity newEntity = factory.manufacturePojo(CompanyEntity.class);
         for (DepartmentEntity d : newEntity.getDepartments()) {
             d.setCompany(newEntity);
@@ -183,17 +184,28 @@ public class CompanyLogicTest {
         Assert.assertNotNull(result.getDepartments());
         Assert.assertEquals(result.getDepartments().size(), entity.getDepartments().size());
 
-        
         for (DepartmentEntity d : result.getDepartments()) {
             boolean found = false;
             for (DepartmentEntity oracle : entity.getDepartments()) {
-                if (d.getName().equals(oracle.getName()))  {
+                if (d.getName().equals(oracle.getName())) {
                     found = true;
                 }
             }
             Assert.assertTrue(found);
-           
+
         }
+
+    }
+
+    /**
+     * Prueba para crear un Company con un nombre que ya existe
+     */
+    @Test(expected = BusinessLogicException.class)
+    public void createCompanyTest2() throws Exception {
+        CompanyEntity newEntity = factory.manufacturePojo(CompanyEntity.class);
+        newEntity.setName(data.get(0).getName());
+
+        CompanyEntity result = companyLogic.createCompany(newEntity);
 
     }
 
