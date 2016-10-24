@@ -30,6 +30,7 @@ import co.edu.uniandes.csw.company.api.ICompanyLogic;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import co.edu.uniandes.csw.company.entities.EmployeeEntity;
 import co.edu.uniandes.csw.company.api.IEmployeeLogic;
+import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -79,6 +80,23 @@ public class DepartmentLogic implements IDepartmentLogic {
     }
 
     /**
+     * Obtiene los datos de una instancia de Department a partir del
+     * identificador de la compañía y el nombre del departmaneto.
+     *
+     * @param companyId identificador de la compañía sobre la que se quiere
+     * buscar un departamento
+     * @param departmentName Nombre del Department a consultar dentro de la
+     * compañía dada por companyId
+     * @return Instancia de DepartmentEntity con los datos del Department
+     * consultado o null sino existe
+     *
+     */
+    @Override
+    public DepartmentEntity getDepartmentByName(Long companyId, String departmentName) {
+        return persistence.findByName(companyId, departmentName);
+    }
+
+    /**
      * Se encarga de crear un Department en la base de datos.
      *
      * @param entity Objeto de DepartmentEntity con los datos nuevos
@@ -87,10 +105,16 @@ public class DepartmentLogic implements IDepartmentLogic {
      *
      */
     @Override
-    public DepartmentEntity createDepartment(Long companyid, DepartmentEntity entity) {
-        CompanyEntity company = companyLogic.getCompany(companyid);
-        entity.setCompany(company);
-        entity = persistence.create(entity);
+    public DepartmentEntity createDepartment(Long companyid, DepartmentEntity entity) throws BusinessLogicException {
+        DepartmentEntity alreadyExist = getDepartmentByName(companyid, entity.getName());
+        if (alreadyExist != null) {
+            throw new BusinessLogicException("Ya existe un departamento con ese nombre en la compañía ");
+        } else {
+            CompanyEntity  company = companyLogic.getCompany(companyid);
+            entity.setCompany(company);
+
+            entity = persistence.create(entity);
+        }
         return entity;
     }
 

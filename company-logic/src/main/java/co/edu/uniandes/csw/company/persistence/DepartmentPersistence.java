@@ -46,6 +46,20 @@ public class DepartmentPersistence {
         return em.find(DepartmentEntity.class, id);
     }
 
+    public DepartmentEntity findByName(Long companyId, String departmentName) {
+        TypedQuery q = em.createQuery("select d from DepartmentEntity d  where d.company.id = :companyId and d.name = :departmentName", DepartmentEntity.class);
+        q = q.setParameter("companyId", companyId);
+        q = q.setParameter("departmentName", departmentName);
+
+        List<DepartmentEntity> departmentsSimilarName = q.getResultList();
+        if (departmentsSimilarName.isEmpty()) {
+            return null;
+        } else {
+            return departmentsSimilarName.get(0);
+        }
+
+    }
+
     public List<DepartmentEntity> findAll() {
         LOGGER.info("Consultando todos los departments");
         Query q = em.createQuery("select u from DepartmentEntity u");

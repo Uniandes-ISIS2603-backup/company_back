@@ -70,7 +70,7 @@ public class DepartmentPersistenceTest {
      * Lista de los departamentos que serán utilizados en las pruebas. La
      * relación entre Company y Department es "composite"
      */
-    private List<DepartmentEntity> data = new ArrayList<>();
+    private List<DepartmentEntity> departmentData = new ArrayList<>();
 
     @Inject
     private DepartmentPersistence departmentPersistence;
@@ -125,7 +125,7 @@ public class DepartmentPersistenceTest {
         for (int i = 0; i < 3; i++) {
             DepartmentEntity entity = factory.manufacturePojo(DepartmentEntity.class);
             entity.setCompany(fatherEntity);
-            data.add(entity);
+            departmentData.add(entity);
             em.persist(entity);
         }
 
@@ -158,10 +158,10 @@ public class DepartmentPersistenceTest {
     @Test
     public void getDepartmentsInCompanyTest() {
         List<DepartmentEntity> list = departmentPersistence.findAllInCompany(fatherEntity.getId());
-        Assert.assertEquals(data.size(), list.size());
+        Assert.assertEquals(departmentData.size(), list.size());
         for (DepartmentEntity ent : list) {
             boolean found = false;
-            for (DepartmentEntity entity : data) {
+            for (DepartmentEntity entity : departmentData) {
                 if (ent.getId().equals(entity.getId())) {
                     found = true;
                 }
@@ -177,12 +177,33 @@ public class DepartmentPersistenceTest {
      */
     @Test
     public void getDepartmentTest() {
-        DepartmentEntity entity = data.get(0);
+        DepartmentEntity entity = departmentData.get(0);
         DepartmentEntity newEntity = departmentPersistence.find(entity.getId());
         Assert.assertNotNull(newEntity);
         Assert.assertEquals(entity.getName(), newEntity.getName());
     }
 
+     /**
+     * Prueba para consultar una Company que existe.
+     */
+    @Test
+    public void getDepartmentByNameTest1() {
+        Long companyId = departmentData.get(0).getCompany().getId();
+        DepartmentEntity dept = departmentPersistence.findByName(companyId, departmentData.get(0).getName());
+        Assert.assertNotNull(dept);
+       
+    }
+   /**
+     * Prueba para consultar una Company que no existe.
+     */
+    @Test
+    public void getDepartmentByNameTest2() {
+        
+        Long companyId = departmentData.get(0).getCompany().getId();
+        DepartmentEntity dept = departmentPersistence.findByName(companyId, " ");
+        Assert.assertNull(dept);
+     
+    }
     /**
      * Prueba para eliminar un Department.
      *
@@ -190,7 +211,7 @@ public class DepartmentPersistenceTest {
      */
     @Test
     public void deleteDepartmentTest() {
-        DepartmentEntity entity = data.get(0);
+        DepartmentEntity entity = departmentData.get(0);
         departmentPersistence.delete(entity.getId());
         DepartmentEntity deleted = em.find(DepartmentEntity.class, entity.getId());
         Assert.assertNull(deleted);
@@ -203,7 +224,7 @@ public class DepartmentPersistenceTest {
      */
     @Test
     public void updateDepartmentTest() {
-        DepartmentEntity entity = data.get(0);
+        DepartmentEntity entity = departmentData.get(0);
         PodamFactory factory = new PodamFactoryImpl();
         DepartmentEntity newEntity = factory.manufacturePojo(DepartmentEntity.class);
 

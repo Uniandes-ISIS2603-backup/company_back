@@ -60,17 +60,8 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 @RunWith(Arquillian.class)
 public class CompanyLogicTest {
 
-    /**
-     *
-     */
-    /**
-     *
-     */
     private PodamFactory factory = new PodamFactoryImpl();
 
-    /**
-     *
-     */
     @Inject
     private ICompanyLogic companyLogic;
     /**
@@ -204,9 +195,7 @@ public class CompanyLogicTest {
     public void createCompanyTest2() throws Exception {
         CompanyEntity newEntity = factory.manufacturePojo(CompanyEntity.class);
         newEntity.setName(data.get(0).getName());
-
         CompanyEntity result = companyLogic.createCompany(newEntity);
-
     }
 
     /**

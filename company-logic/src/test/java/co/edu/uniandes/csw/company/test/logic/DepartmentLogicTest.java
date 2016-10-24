@@ -29,6 +29,7 @@ import co.edu.uniandes.csw.company.entities.DepartmentEntity;
 import co.edu.uniandes.csw.company.persistence.DepartmentPersistence;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import co.edu.uniandes.csw.company.entities.EmployeeEntity;
+import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,7 +85,7 @@ public class DepartmentLogicTest {
     /**
      *
      */
-    private List<DepartmentEntity> data = new ArrayList<DepartmentEntity>();
+    private List<DepartmentEntity> departmentData = new ArrayList<DepartmentEntity>();
 
     /**
      *
@@ -166,7 +167,7 @@ public class DepartmentLogicTest {
             DepartmentEntity entity = factory.manufacturePojo(DepartmentEntity.class);
             entity.setCompany(fatherEntity);
             em.persist(entity);
-            data.add(entity);
+            departmentData.add(entity);
 
             if (i == 0) {
                 employeesData.get(i).setDepartment(entity);
@@ -180,7 +181,7 @@ public class DepartmentLogicTest {
      *
      */
     @Test
-    public void createDepartmentTest() {
+    public void createDepartmentTest1() throws BusinessLogicException{
         DepartmentEntity newEntity = factory.manufacturePojo(DepartmentEntity.class);
         DepartmentEntity result = departmentLogic.createDepartment(fatherEntity.getId(), newEntity);
         Assert.assertNotNull(result);
@@ -188,7 +189,16 @@ public class DepartmentLogicTest {
         Assert.assertEquals(newEntity.getName(), entity.getName());
         Assert.assertEquals(newEntity.getId(), entity.getId());
     }
-
+ /**
+     * Prueba para crear un Company con un nombre que ya existe
+     */
+    @Test(expected = BusinessLogicException.class)
+    public void createDepartmentTest2() throws Exception {
+        DepartmentEntity dept = factory.manufacturePojo(DepartmentEntity.class);
+        dept.setCompany(fatherEntity);
+        dept.setName(departmentData.get(0).getName());
+        DepartmentEntity result = departmentLogic.createDepartment(departmentData.get(0).getCompany().getId(), dept);
+    }
     /**
      * Prueba para consultar la lista de Departments
      *
@@ -197,10 +207,10 @@ public class DepartmentLogicTest {
     @Test
     public void getDepartmentsTest() {
         List<DepartmentEntity> list = departmentLogic.getDepartments(fatherEntity.getId());
-        Assert.assertEquals(data.size(), list.size());
+        Assert.assertEquals(departmentData.size(), list.size());
         for (DepartmentEntity entity : list) {
             boolean found = false;
-            for (DepartmentEntity storedEntity : data) {
+            for (DepartmentEntity storedEntity : departmentData) {
                 if (entity.getId().equals(storedEntity.getId())) {
                     found = true;
                 }
@@ -216,7 +226,7 @@ public class DepartmentLogicTest {
      */
     @Test
     public void getDepartmentTest() {
-        DepartmentEntity entity = data.get(0);
+        DepartmentEntity entity = departmentData.get(0);
         DepartmentEntity resultEntity = departmentLogic.getDepartment(entity.getId());
         Assert.assertNotNull(resultEntity);
         Assert.assertEquals(entity.getName(), resultEntity.getName());
@@ -230,7 +240,7 @@ public class DepartmentLogicTest {
      */
     @Test
     public void deleteDepartmentTest() {
-        DepartmentEntity entity = data.get(1);
+        DepartmentEntity entity = departmentData.get(1);
         departmentLogic.deleteDepartment(entity.getId());
         DepartmentEntity deleted = em.find(DepartmentEntity.class, entity.getId());
         Assert.assertNull(deleted);
@@ -243,7 +253,7 @@ public class DepartmentLogicTest {
      */
     @Test
     public void updateDepartmentTest() {
-        DepartmentEntity entity = data.get(0);
+        DepartmentEntity entity = departmentData.get(0);
         DepartmentEntity pojoEntity = factory.manufacturePojo(DepartmentEntity.class);
 
         pojoEntity.setId(entity.getId());
@@ -264,7 +274,7 @@ public class DepartmentLogicTest {
      */
     @Test
     public void getEmployeesTest() {
-        DepartmentEntity entity = data.get(0);
+        DepartmentEntity entity = departmentData.get(0);
         EmployeeEntity employeeEntity = employeesData.get(0);
         EmployeeEntity response = departmentLogic.getEmployee(entity.getId(), employeeEntity.getId());
 
@@ -281,7 +291,7 @@ public class DepartmentLogicTest {
      */
     @Test
     public void listEmployeesTest() {
-        List<EmployeeEntity> list = departmentLogic.listEmployees(data.get(0).getId());
+        List<EmployeeEntity> list = departmentLogic.listEmployees(departmentData.get(0).getId());
         Assert.assertEquals(1, list.size());
     }
 
@@ -292,7 +302,7 @@ public class DepartmentLogicTest {
      */
     @Test
     public void addEmployeesTest() {
-        DepartmentEntity entity = data.get(0);
+        DepartmentEntity entity = departmentData.get(0);
         EmployeeEntity employeeEntity = employeesData.get(1);
         EmployeeEntity response = departmentLogic.addEmployee(entity.getId(), employeeEntity.getId());
 
@@ -308,7 +318,7 @@ public class DepartmentLogicTest {
      */
     @Test
     public void replaceEmployeesTest() {
-        DepartmentEntity entity = data.get(0);
+        DepartmentEntity entity = departmentData.get(0);
         List<EmployeeEntity> list = employeesData.subList(1, 3);
         departmentLogic.replaceEmployees(entity.getId(), list);
 
@@ -325,8 +335,8 @@ public class DepartmentLogicTest {
      */
     @Test
     public void removeEmployeesTest() {
-        departmentLogic.removeEmployee(data.get(0).getId(), employeesData.get(0).getId());
-        EmployeeEntity response = departmentLogic.getEmployee(data.get(0).getId(), employeesData.get(0).getId());
+        departmentLogic.removeEmployee(departmentData.get(0).getId(), employeesData.get(0).getId());
+        EmployeeEntity response = departmentLogic.getEmployee(departmentData.get(0).getId(), employeesData.get(0).getId());
         Assert.assertNull(response);
     }
 }

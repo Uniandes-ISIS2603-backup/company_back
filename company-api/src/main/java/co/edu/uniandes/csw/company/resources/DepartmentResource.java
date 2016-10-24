@@ -38,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 import co.edu.uniandes.csw.company.api.IDepartmentLogic;
 import co.edu.uniandes.csw.company.dtos.DepartmentDetailDTO;
 import co.edu.uniandes.csw.company.entities.DepartmentEntity;
+import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
 import java.util.ArrayList;
 import javax.ws.rs.WebApplicationException;
 
@@ -111,7 +112,7 @@ public class DepartmentResource {
      *
      */
     @POST
-    public DepartmentDetailDTO createDepartment(DepartmentDetailDTO dto) {
+    public DepartmentDetailDTO createDepartment(DepartmentDetailDTO dto) throws BusinessLogicException {
         return new DepartmentDetailDTO(departmentLogic.createDepartment(companyId, dto.toEntity()));
     }
 

@@ -25,13 +25,15 @@ package co.edu.uniandes.csw.company.api;
 
 import co.edu.uniandes.csw.company.entities.DepartmentEntity;
 import co.edu.uniandes.csw.company.entities.EmployeeEntity;
+import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
 import java.util.List;
 
 public interface IDepartmentLogic {
   
     public List<DepartmentEntity> getDepartments(Long companyId);
     public DepartmentEntity getDepartment(Long departmentid);
-    public DepartmentEntity createDepartment(Long companyid, DepartmentEntity entity);
+    public DepartmentEntity getDepartmentByName(Long companyId, String departmentName);
+    public DepartmentEntity createDepartment(Long companyid, DepartmentEntity entity) throws BusinessLogicException ;
     public DepartmentEntity updateDepartment(Long companyid, DepartmentEntity entity);
     public void deleteDepartment(Long id);
     public List<EmployeeEntity> listEmployees(Long departmentId);
