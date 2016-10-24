@@ -50,8 +50,14 @@ public class CompanyPersistence {
         LOGGER.log(Level.INFO, "Consultando company con name = {0}", name);
         TypedQuery<CompanyEntity> q
                 = em.createQuery("select u from CompanyEntity u where u.name = :name", CompanyEntity.class);
-        q = q.setParameter("name", name); 
-        return q.getSingleResult();
+        q = q.setParameter("name", name);
+        
+       List<CompanyEntity> companiesSimilarName = q.getResultList();
+        if (companiesSimilarName.isEmpty() ) {
+            return null; 
+        } else {
+            return companiesSimilarName.get(0);
+        }
     }
 
     public List<CompanyEntity> findAll() {
@@ -61,9 +67,9 @@ public class CompanyPersistence {
     }
 
     public CompanyEntity create(CompanyEntity entity) {
-        LOGGER.info("Creando un company nuevo "+entity.getDepartments().size());
+        LOGGER.info("Creando un company nuevo " + entity.getName());
         em.persist(entity);
-        LOGGER.info("Company creado "+entity.getDepartments().size());
+        
         return entity;
     }
 

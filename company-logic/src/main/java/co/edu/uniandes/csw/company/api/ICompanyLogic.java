@@ -24,6 +24,7 @@ SOFTWARE.
 package co.edu.uniandes.csw.company.api;
 
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
+import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
 import java.util.List;
 
 public interface ICompanyLogic {
@@ -34,7 +35,7 @@ public interface ICompanyLogic {
 
     public CompanyEntity getCompanyByName(String name);
 
-    public CompanyEntity createCompany(CompanyEntity entity);
+    public CompanyEntity createCompany(CompanyEntity entity) throws BusinessLogicException;
 
     public CompanyEntity updateCompany(CompanyEntity entity);
 

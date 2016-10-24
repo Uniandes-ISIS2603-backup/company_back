@@ -3,6 +3,7 @@ package co.edu.uniandes.csw.company.ejbs;
 import co.edu.uniandes.csw.company.api.ICompanyLogic;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import co.edu.uniandes.csw.company.persistence.CompanyPersistence;
+import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -43,8 +44,14 @@ public class CompanyLogic implements ICompanyLogic {
      *
      */
     @Override
-    public CompanyEntity createCompany(CompanyEntity entity) {
-        persistence.create(entity);
+    public CompanyEntity createCompany(CompanyEntity entity) throws BusinessLogicException {
+        CompanyEntity alreadyExist = getCompanyByName(entity.getName());
+        if (alreadyExist != null) {
+            throw new BusinessLogicException("Ya existe una compañía con ese nombre");
+        } else
+        {
+            persistence.create(entity);
+        }
         return entity;
     }
 

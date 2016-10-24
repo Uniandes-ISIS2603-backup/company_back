@@ -161,16 +161,25 @@ public class CompanyPersistenceTest {
     }
 
     /**
-     * Prueba para consultar una Company.
+     * Prueba para consultar una Company que existe.
      */
     @Test
-    public void getCompanyByNameTest() {
+    public void getCompanyByNameTest1() {
         CompanyEntity entity = data.get(0);
         CompanyEntity newEntity = companyPersistence.findByName(entity.getName());
         Assert.assertNotNull(newEntity);
         Assert.assertEquals(entity.getName(), newEntity.getName());
     }
-
+   /**
+     * Prueba para consultar una Company que no existe.
+     */
+    @Test
+    public void getCompanyByNameTest2() {
+        
+        CompanyEntity newEntity = companyPersistence.findByName("");
+        Assert.assertNull(newEntity);
+     
+    }
     /**
      * Prueba para eliminar un Company.
      */

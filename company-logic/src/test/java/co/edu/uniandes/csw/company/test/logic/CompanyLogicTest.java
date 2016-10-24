@@ -168,33 +168,32 @@ public class CompanyLogicTest {
     @Test
     public void createCompanyTest() throws NotSupportedException, Exception {
         CompanyEntity newEntity = factory.manufacturePojo(CompanyEntity.class);
-        System.out.println("1 " + newEntity.getDepartments().size());
+        for (DepartmentEntity d : newEntity.getDepartments()) {
+            d.setCompany(newEntity);
+        }
+
         CompanyEntity result = companyLogic.createCompany(newEntity);
         Assert.assertNotNull(result);
-        System.out.println("2 " + result.getDepartments().size());
 
         CompanyEntity entity = em.find(CompanyEntity.class, result.getId());
-        System.out.println("3 " + entity.getDepartments().size());
 
-        TypedQuery q = em.createQuery("select d from DepartmentEntity d  where d.company.id = :companyId", DepartmentEntity.class);
-        q = q.setParameter("companyId", result.getId());
-        List<DepartmentEntity> list = (List<DepartmentEntity>) q.getResultList();
-
-        System.out.println("4 " + list.size());
-        list = departmentPersistence.findAll();
-        
-        for (DepartmentEntity d: list){
-            System.out.println(d.getName()+" "+d.getCompany().getId());
-            
-        }
         Assert.assertEquals(newEntity.getName(), entity.getName());
         Assert.assertEquals(newEntity.getId(), entity.getId());
-
-        entity.setDepartments(list);
-
         Assert.assertNotNull(entity.getDepartments());
         Assert.assertNotNull(result.getDepartments());
         Assert.assertEquals(result.getDepartments().size(), entity.getDepartments().size());
+
+        
+        for (DepartmentEntity d : result.getDepartments()) {
+            boolean found = false;
+            for (DepartmentEntity oracle : entity.getDepartments()) {
+                if (d.getName().equals(oracle.getName()))  {
+                    found = true;
+                }
+            }
+            Assert.assertTrue(found);
+           
+        }
 
     }
 
