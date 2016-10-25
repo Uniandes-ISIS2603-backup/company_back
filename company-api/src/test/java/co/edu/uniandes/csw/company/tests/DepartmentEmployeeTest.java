@@ -69,9 +69,9 @@ public class DepartmentEmployeeTest {
     private final int Created = 200; // Status.CREATED.getStatusCode();
     private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
     private final String departmentPath = "departments";
-    private final static List<DepartmentEntity> oraculo = new ArrayList<>();
+    private final static List<DepartmentEntity> departmentList = new ArrayList<>();
     private final String employeesPath = "employees";
-    private final static List<EmployeeEntity> oraculoEmployees = new ArrayList<>();
+    private final static List<EmployeeEntity> employeeList = new ArrayList<>();
     private WebTarget target;
     private final String apiPath = "api";  
     private final String companyPath = "companies";
@@ -111,8 +111,8 @@ public class DepartmentEmployeeTest {
         em.createQuery("delete from EmployeeEntity").executeUpdate();
         em.createQuery("delete from CompanyEntity").executeUpdate();
         em.createQuery("delete from DepartmentEntity").executeUpdate();
-        oraculoEmployees.clear();
-        oraculo.clear();
+        employeeList.clear();
+        departmentList.clear();
     }
 
   
@@ -137,7 +137,7 @@ public class DepartmentEmployeeTest {
                 utx.begin();
                 em.persist(department);
                 utx.commit();
-                oraculo.add(department);
+                departmentList.add(department);
 
                 EmployeeEntity employees = factory.manufacturePojo(EmployeeEntity.class);
                 employees.setId(i + 1L);
@@ -145,7 +145,7 @@ public class DepartmentEmployeeTest {
                 utx.begin();
                 em.persist(employees);
                 utx.commit();
-                oraculoEmployees.add(employees);                     
+                employeeList.add(employees);                     
                 
                 
             }
@@ -193,14 +193,12 @@ public class DepartmentEmployeeTest {
      * 
      */
     @Test
-    public void addEmployeesTest() {
-       
-
-        EmployeeDTO employees = new EmployeeDTO(oraculoEmployees.get(1));
-        DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
+    public void addEmployeesTest() {      
+        EmployeeDTO employees = new EmployeeDTO(employeeList.get(1));
+        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
 
         Response response = target.path(fatherCompanyEntity.getId().toString())
-                . path(departmentPath).path(department.getId().toString())
+                .path(departmentPath).path(department.getId().toString())
                 .path(employeesPath).path(employees.getId().toString())
                 .request()
                 .post(Entity.entity(employees, MediaType.APPLICATION_JSON));
@@ -218,7 +216,7 @@ public class DepartmentEmployeeTest {
     @Test
     public void listEmployeesTest() throws IOException {
    
-        DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
+        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
 
         Response response = target.path(fatherCompanyEntity.getId().toString())
                 .path(departmentPath)
@@ -240,8 +238,8 @@ public class DepartmentEmployeeTest {
     @Test
     public void getEmployeesTest() throws IOException {
       
-        EmployeeDTO employees = new EmployeeDTO(oraculoEmployees.get(0));
-        DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
+        EmployeeDTO employees = new EmployeeDTO(employeeList.get(0));
+        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
 
         EmployeeDTO employeesTest = target.path(fatherCompanyEntity.getId().toString())
                 .path(departmentPath)
@@ -262,8 +260,8 @@ public class DepartmentEmployeeTest {
     @Test
     public void removeEmployeesTest() {
     
-        EmployeeDTO employees = new EmployeeDTO(oraculoEmployees.get(0));
-        DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
+        EmployeeDTO employees = new EmployeeDTO(employeeList.get(0));
+        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
 
         Response response = target.path(fatherCompanyEntity.getId().toString())
                 .path(departmentPath).path(department.getId().toString())
