@@ -20,15 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 package co.edu.uniandes.csw.company.tests;
-
 
 import co.edu.uniandes.csw.company.entities.DepartmentEntity;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import co.edu.uniandes.csw.company.dtos.DepartmentDTO;
 import co.edu.uniandes.csw.company.resources.DepartmentResource;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -41,40 +40,46 @@ import javax.persistence.PersistenceContext;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Cookie;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.junit.InSequence;
+
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
-
+/*
+ * Testing URI: companys/{departmentsId: \\d+}/departments/
+ */
 @RunWith(Arquillian.class)
 public class DepartmentTest {
 
-    private final int Ok = Status.OK.getStatusCode();
-    private final int Created = Status.CREATED.getStatusCode();
-    private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
-    private final String departmentPath = "departments";
-    private final static List<DepartmentEntity> oraculo = new ArrayList<>();
     private WebTarget target;
-    private final String apiPath = "api";
-    private final String username = System.getenv("USERNAME_USER");
-    private final String password = System.getenv("PASSWORD_USER");    
+
+    PodamFactory factory = new PodamFactoryImpl();
+
+    private final int Ok = Status.OK.getStatusCode();
+    private final int Created = 200; //Status.CREATED.getStatusCode();
+    private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
+
+    private final static List<DepartmentEntity> oraculo = new ArrayList<>();
+
     private final String companyPath = "companies";
+    private final String departmentPath = "departments";
+    private final String apiPath = "api";
     CompanyEntity fatherCompanyEntity;
 
     @ArquillianResource
@@ -93,7 +98,7 @@ public class DepartmentTest {
                 .addAsResource("META-INF/persistence.xml", "META-INF/persistence.xml")
                 // El archivo beans.xml es necesario para injeccion de dependencias.
                 .addAsWebInfResource(new File("src/main/webapp/WEB-INF/beans.xml"))
-                 // El archivo web.xml es necesario para el despliegue de los servlets
+                // El archivo web.xml es necesario para el despliegue de los servlets
                 .setWebXML(new File("src/main/webapp/WEB-INF/web.xml"));
     }
 
@@ -108,26 +113,22 @@ public class DepartmentTest {
     private UserTransaction utx;
 
     private void clearData() {
-        
         em.createQuery("delete from DepartmentEntity").executeUpdate();
         em.createQuery("delete from CompanyEntity").executeUpdate();
         oraculo.clear();
     }
 
-  
-
-   /**
+    /**
      * Datos iniciales para el correcto funcionamiento de las pruebas.
      *
-     * 
+     * @generated
      */
     public void insertData() {
-        PodamFactory factory = new PodamFactoryImpl();
         fatherCompanyEntity = factory.manufacturePojo(CompanyEntity.class);
         fatherCompanyEntity.setId(1L);
         em.persist(fatherCompanyEntity);
-        
-        for (int i = 0; i < 3; i++) {            
+
+        for (int i = 0; i < 3; i++) {
             DepartmentEntity department = factory.manufacturePojo(DepartmentEntity.class);
             department.setId(i + 1L);
             department.setCompany(fatherCompanyEntity);
@@ -136,16 +137,13 @@ public class DepartmentTest {
         }
     }
 
- 
-
     /**
      * Configuración inicial de la prueba.
      *
-     * 
+     * @generated
      */
     @Before
     public void setUpTest() {
-        target = createWebTarget();
         try {
             utx.begin();
             clearData();
@@ -159,27 +157,31 @@ public class DepartmentTest {
                 e1.printStackTrace();
             }
         }
+        target = createWebTarget()
+                .path(companyPath)
+                .path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath);
     }
 
     /**
      * Prueba para crear un Department
      *
-     * 
+     * @generated
      */
     @Test
     public void createDepartmentTest() throws IOException {
-        PodamFactory factory = new PodamFactoryImpl();
         DepartmentDTO department = factory.manufacturePojo(DepartmentDTO.class);
-   
+
         Response response = target
-            .path(companyPath).path(fatherCompanyEntity.getId().toString())
-          .path(departmentPath)
-            .request()
-            .post(Entity.entity(department, MediaType.APPLICATION_JSON));
-        
-        DepartmentDTO  departmentTest = (DepartmentDTO) response.readEntity(DepartmentDTO.class);
+                .request()
+                .post(Entity.entity(department, MediaType.APPLICATION_JSON));
+
+        DepartmentDTO departmentTest = (DepartmentDTO) response.readEntity(DepartmentDTO.class);
+
+        Assert.assertEquals(Created, response.getStatus());
+
         Assert.assertEquals(department.getName(), departmentTest.getName());
-        Assert.assertEquals(Ok, response.getStatus());
+
         DepartmentEntity entity = em.find(DepartmentEntity.class, departmentTest.getId());
         Assert.assertNotNull(entity);
     }
@@ -187,79 +189,76 @@ public class DepartmentTest {
     /**
      * Prueba para consultar un Department
      *
-     * 
+     * @generated
      */
     @Test
-    public void getDepartmentById() {
-    
+    public void getDepartmentByIdTest() {
+        DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
+        WebTarget webt = target
+                .path(department.getId().toString());
+        System.out.println(webt.getUri().toString());
         DepartmentDTO departmentTest = target
-            .path(companyPath).path(fatherCompanyEntity.getId().toString())
-          .path(departmentPath)
-            .path(oraculo.get(0).getId().toString())
-            .request().get(DepartmentDTO.class);
-        
-        Assert.assertEquals(departmentTest.getName(), oraculo.get(0).getName());
+                .request().get(DepartmentDTO.class);
+
         Assert.assertEquals(departmentTest.getId(), oraculo.get(0).getId());
+        Assert.assertEquals(departmentTest.getName(), oraculo.get(0).getName());
     }
 
     /**
      * Prueba para consultar la lista de Departments
      *
-     * 
+     * @generated
      */
     @Test
     public void listDepartmentTest() throws IOException {
-    
+
         Response response = target
-            .path(companyPath).path(fatherCompanyEntity.getId().toString())
-          .path(departmentPath)
-            .request().get();
-        
+                .request().get();
+
         String listDepartment = response.readEntity(String.class);
         List<DepartmentDTO> listDepartmentTest = new ObjectMapper().readValue(listDepartment, List.class);
         Assert.assertEquals(Ok, response.getStatus());
-        Assert.assertEquals(3, listDepartmentTest.size());
+        Assert.assertEquals(oraculo.size(), listDepartmentTest.size());
     }
 
     /**
      * Prueba para actualizar un Department
      *
-     * 
+     * @generated
      */
     @Test
     public void updateDepartmentTest() throws IOException {
-        
+
         DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
-        PodamFactory factory = new PodamFactoryImpl();
+
         DepartmentDTO departmentChanged = factory.manufacturePojo(DepartmentDTO.class);
+
         department.setName(departmentChanged.getName());
+
         Response response = target
-            .path(companyPath).path(fatherCompanyEntity.getId().toString())
-          .path(departmentPath)
-            .path(department.getId().toString())
-            .request().put(Entity.entity(department, MediaType.APPLICATION_JSON));
-        
+                .path(department.getId().toString())
+                .request()
+                .put(Entity.entity(department, MediaType.APPLICATION_JSON));
+
         DepartmentDTO departmentTest = (DepartmentDTO) response.readEntity(DepartmentDTO.class);
+
         Assert.assertEquals(Ok, response.getStatus());
         Assert.assertEquals(department.getName(), departmentTest.getName());
     }
-    
+
     /**
      * Prueba para eliminar un Department
      *
-     * 
+     * @generated
      */
     @Test
     public void deleteDepartmentTest() {
-       
+
         DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
         Response response = target
-            .path(companyPath).path(fatherCompanyEntity.getId().toString())
-          .path(departmentPath)
-            .path(department.getId().toString())
-            .request().delete();
-        
+                .path(department.getId().toString())
+                .request().delete();
+
         Assert.assertEquals(OkWithoutContent, response.getStatus());
     }
-    
 }

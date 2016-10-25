@@ -27,7 +27,7 @@ package co.edu.uniandes.csw.company.tests;
 import co.edu.uniandes.csw.company.entities.EmployeeEntity;
 import co.edu.uniandes.csw.company.dtos.EmployeeDTO;
 import co.edu.uniandes.csw.company.resources.EmployeeResource;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.codehaus.jackson.map.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -40,7 +40,6 @@ import javax.persistence.PersistenceContext;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -65,14 +64,12 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 public class EmployeeTest {
 
     private final int Ok = Status.OK.getStatusCode();
-    private final int Created = Status.CREATED.getStatusCode();
+    private final int Created = 200; // Status.CREATED.getStatusCode();
     private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
     private final String employeePath = "employees";
     private final static List<EmployeeEntity> oraculo = new ArrayList<>();
     private WebTarget target;
     private final String apiPath = "api";
-    private final String username = System.getenv("USERNAME_USER");
-    private final String password = System.getenv("PASSWORD_USER");    
 
     @ArquillianResource
     private URL deploymentURL;
@@ -90,8 +87,7 @@ public class EmployeeTest {
                 .addAsResource("META-INF/persistence.xml", "META-INF/persistence.xml")
                 // El archivo beans.xml es necesario para injeccion de dependencias.
                 .addAsWebInfResource(new File("src/main/webapp/WEB-INF/beans.xml"))
-                // El archivo shiro.ini es necesario para injeccion de dependencias
-                .addAsWebInfResource(new File("src/main/webapp/WEB-INF/shiro.ini"))
+                
                 // El archivo web.xml es necesario para el despliegue de los servlets
                 .setWebXML(new File("src/main/webapp/WEB-INF/web.xml"));
     }

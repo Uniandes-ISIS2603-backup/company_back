@@ -27,7 +27,7 @@ package co.edu.uniandes.csw.company.tests;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import co.edu.uniandes.csw.company.dtos.CompanyDTO;
 import co.edu.uniandes.csw.company.resources.CompanyResource;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -44,6 +44,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -65,7 +66,7 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 public class CompanyTest {
 
     private final int Ok = Status.OK.getStatusCode();
-    private final int Created = Status.CREATED.getStatusCode();
+    private final int Created = 200; // Status.CREATED.getStatusCode();
     private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
     private final String companyPath = "companies";
     private final static List<CompanyEntity> oraculo = new ArrayList<>();
