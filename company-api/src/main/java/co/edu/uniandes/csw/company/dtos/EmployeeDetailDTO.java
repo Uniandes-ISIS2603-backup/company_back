@@ -20,53 +20,54 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 package co.edu.uniandes.csw.company.dtos;
 
 import co.edu.uniandes.csw.company.entities.EmployeeEntity;
 import javax.xml.bind.annotation.XmlRootElement;
 import uk.co.jemos.podam.common.PodamExclude;
 
-
 @XmlRootElement
-public class EmployeeDetailDTO extends EmployeeDTO{
-
+public class EmployeeDetailDTO extends EmployeeDTO {
 
     @PodamExclude
     private DepartmentDTO department;
 
     /**
-     * 
+     *
      */
     public EmployeeDetailDTO() {
         super();
     }
 
     /**
-     * Crea un objeto EmployeeDetailDTO a partir de un objeto EmployeeEntity incluyendo los atributos de EmployeeDTO.
+     * Crea un objeto EmployeeDetailDTO a partir de un objeto EmployeeEntity
+     * incluyendo los atributos de EmployeeDTO.
      *
-     * @param entity Entidad EmployeeEntity desde la cual se va a crear el nuevo objeto.
-     * 
+     * @param entity Entidad EmployeeEntity desde la cual se va a crear el nuevo
+     * objeto.
+     *
      */
     public EmployeeDetailDTO(EmployeeEntity entity) {
         super(entity);
-        if (entity.getDepartment()!=null){
-        this.department = new DepartmentDTO(entity.getDepartment());
+        if (entity.getDepartment() != null) {
+            this.department = new DepartmentDTO(entity.getDepartment());
         }
-        
+
     }
 
     /**
-     * Convierte un objeto EmployeeDetailDTO a EmployeeEntity incluyendo los atributos de EmployeeDTO.
+     * Convierte un objeto EmployeeDetailDTO a EmployeeEntity incluyendo los
+     * atributos de EmployeeDTO.
      *
-     * @return  objeto EmployeeEntity.
-     * 
+     * @return objeto EmployeeEntity.
+     *
      */
     @Override
     public EmployeeEntity toEntity() {
         EmployeeEntity entity = super.toEntity();
-        if (this.getDepartment()!=null){
-        entity.setDepartment(this.getDepartment().toEntity());
+        if (this.getDepartment() != null) {
+            entity.setDepartment(this.getDepartment().toEntity());
         }
         return entity;
     }
@@ -75,7 +76,7 @@ public class EmployeeDetailDTO extends EmployeeDTO{
      * Obtiene el atributo department.
      *
      * @return atributo department.
-     * 
+     *
      */
     public DepartmentDTO getDepartment() {
         return department;
@@ -85,7 +86,7 @@ public class EmployeeDetailDTO extends EmployeeDTO{
      * Establece el valor del atributo department.
      *
      * @param department nuevo valor del atributo
-     * 
+     *
      */
     public void setDepartment(DepartmentDTO department) {
         this.department = department;

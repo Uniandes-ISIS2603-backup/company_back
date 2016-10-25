@@ -24,6 +24,8 @@ SOFTWARE.
 package co.edu.uniandes.csw.company.dtos;
 
 import co.edu.uniandes.csw.company.entities.DepartmentEntity;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import uk.co.jemos.podam.common.PodamExclude;
 
@@ -34,6 +36,8 @@ public class DepartmentDetailDTO extends DepartmentDTO {
     @PodamExclude
     private CompanyDTO company;
 
+     // relación  cero o muchos con departments 
+    private List<EmployeeDTO> employees = new ArrayList<>();
     /**
      *
      */
@@ -91,6 +95,20 @@ public class DepartmentDetailDTO extends DepartmentDTO {
      */
     public void setCompany(CompanyDTO company) {
         this.company = company;
+    }
+
+    /**
+     * @return the employees
+     */
+    public List<EmployeeDTO> getEmployees() {
+        return employees;
+    }
+
+    /**
+     * @param employees the employees to set
+     */
+    public void setEmployees(List<EmployeeDTO> employees) {
+        this.employees = employees;
     }
 
 }
