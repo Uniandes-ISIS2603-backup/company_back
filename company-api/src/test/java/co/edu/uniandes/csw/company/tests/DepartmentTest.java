@@ -75,7 +75,7 @@ public class DepartmentTest {
     private final int Created = 200; //Status.CREATED.getStatusCode();
     private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
 
-    private final static List<DepartmentEntity> oraculo = new ArrayList<>();
+    private final static List<DepartmentEntity> departmentList = new ArrayList<>();
 
     private final String companyPath = "companies";
     private final String departmentPath = "departments";
@@ -115,7 +115,7 @@ public class DepartmentTest {
     private void clearData() {
         em.createQuery("delete from DepartmentEntity").executeUpdate();
         em.createQuery("delete from CompanyEntity").executeUpdate();
-        oraculo.clear();
+        departmentList.clear();
     }
 
     /**
@@ -133,7 +133,7 @@ public class DepartmentTest {
             department.setId(i + 1L);
             department.setCompany(fatherCompanyEntity);
             em.persist(department);
-            oraculo.add(department);
+            departmentList.add(department);
         }
     }
 
@@ -144,6 +144,9 @@ public class DepartmentTest {
      */
     @Before
     public void setUpTest() {
+        target = createWebTarget()
+                .path(companyPath);
+
         try {
             utx.begin();
             clearData();
@@ -157,10 +160,7 @@ public class DepartmentTest {
                 e1.printStackTrace();
             }
         }
-        target = createWebTarget()
-                .path(companyPath)
-                .path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath);
+
     }
 
     /**
@@ -173,6 +173,8 @@ public class DepartmentTest {
         DepartmentDTO department = factory.manufacturePojo(DepartmentDTO.class);
 
         Response response = target
+                .path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath)
                 .request()
                 .post(Entity.entity(department, MediaType.APPLICATION_JSON));
 
@@ -193,15 +195,16 @@ public class DepartmentTest {
      */
     @Test
     public void getDepartmentByIdTest() {
-        DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
-        WebTarget webt = target
-                .path(department.getId().toString());
-        System.out.println(webt.getUri().toString());
+        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
+
         DepartmentDTO departmentTest = target
+                .path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath)
+                .path(department.getId().toString())
                 .request().get(DepartmentDTO.class);
 
-        Assert.assertEquals(departmentTest.getId(), oraculo.get(0).getId());
-        Assert.assertEquals(departmentTest.getName(), oraculo.get(0).getName());
+        Assert.assertEquals(departmentTest.getId(), departmentList.get(0).getId());
+        Assert.assertEquals(departmentTest.getName(), departmentList.get(0).getName());
     }
 
     /**
@@ -213,12 +216,14 @@ public class DepartmentTest {
     public void listDepartmentTest() throws IOException {
 
         Response response = target
+                .path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath)
                 .request().get();
 
         String listDepartment = response.readEntity(String.class);
         List<DepartmentDTO> listDepartmentTest = new ObjectMapper().readValue(listDepartment, List.class);
         Assert.assertEquals(Ok, response.getStatus());
-        Assert.assertEquals(oraculo.size(), listDepartmentTest.size());
+        Assert.assertEquals(departmentList.size(), listDepartmentTest.size());
     }
 
     /**
@@ -229,13 +234,15 @@ public class DepartmentTest {
     @Test
     public void updateDepartmentTest() throws IOException {
 
-        DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
+        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
 
         DepartmentDTO departmentChanged = factory.manufacturePojo(DepartmentDTO.class);
 
         department.setName(departmentChanged.getName());
 
         Response response = target
+                .path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath)
                 .path(department.getId().toString())
                 .request()
                 .put(Entity.entity(department, MediaType.APPLICATION_JSON));
@@ -254,8 +261,10 @@ public class DepartmentTest {
     @Test
     public void deleteDepartmentTest() {
 
-        DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
+        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
         Response response = target
+                .path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath)
                 .path(department.getId().toString())
                 .request().delete();
 

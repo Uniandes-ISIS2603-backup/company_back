@@ -69,7 +69,7 @@ public class CompanyTest {
     private final int Created = 200; // Status.CREATED.getStatusCode();
     private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
     private final String companyPath = "companies";
-    private final static List<CompanyEntity> oraculo = new ArrayList<>();
+    private final static List<CompanyEntity> companyList = new ArrayList<>();
     private WebTarget target;
     private final String apiPath = "api";
     
@@ -107,7 +107,7 @@ public class CompanyTest {
     private void clearData() {
         
         em.createQuery("delete from CompanyEntity").executeUpdate();    
-        oraculo.clear();
+        companyList.clear();
     }
 
   
@@ -123,7 +123,7 @@ public class CompanyTest {
             CompanyEntity company = factory.manufacturePojo(CompanyEntity.class);
             company.setId(i + 1L);
             em.persist(company);
-            oraculo.add(company);
+            companyList.add(company);
         }
     }
 
@@ -181,11 +181,11 @@ public class CompanyTest {
     public void getCompanyById() {
         
         CompanyDTO companyTest = target.path(companyPath)
-                .path(oraculo.get(0).getId().toString())
+                .path(companyList.get(0).getId().toString())
                 .request().get(CompanyDTO.class);
         
-        Assert.assertEquals(companyTest.getName(), oraculo.get(0).getName());
-        Assert.assertEquals(companyTest.getId(), oraculo.get(0).getId());
+        Assert.assertEquals(companyTest.getName(), companyList.get(0).getName());
+        Assert.assertEquals(companyTest.getId(), companyList.get(0).getId());
     }
 
     /**
@@ -213,7 +213,7 @@ public class CompanyTest {
     @Test
     public void updateCompanyTest() throws IOException {
        
-        CompanyDTO company = new CompanyDTO(oraculo.get(0));
+        CompanyDTO company = new CompanyDTO(companyList.get(0));
         PodamFactory factory = new PodamFactoryImpl();
         CompanyDTO companyChanged = factory.manufacturePojo(CompanyDTO.class);
         company.setName(companyChanged.getName());
@@ -233,7 +233,7 @@ public class CompanyTest {
     @Test
     public void deleteCompanyTest() {
       
-        CompanyDTO company = new CompanyDTO(oraculo.get(0));
+        CompanyDTO company = new CompanyDTO(companyList.get(0));
         Response response = target.path(companyPath).path(company.getId().toString())
                 .request().delete();
         
