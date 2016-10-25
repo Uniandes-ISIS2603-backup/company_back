@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import co.edu.uniandes.csw.company.api.ICompanyLogic;
 import co.edu.uniandes.csw.company.dtos.CompanyDetailDTO;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
+import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
 import java.util.ArrayList;
 import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
@@ -112,7 +113,7 @@ public class CompanyResource {
      *
      */
     @POST
-    public CompanyDetailDTO createCompany(CompanyDetailDTO dto) {
+    public CompanyDetailDTO createCompany(CompanyDetailDTO dto) throws BusinessLogicException {
         return new CompanyDetailDTO(companyLogic.createCompany(dto.toEntity()));
     }
 
@@ -127,10 +128,9 @@ public class CompanyResource {
     @PUT
     @Path("{id: \\d+}")
     public CompanyDetailDTO updateCompany(@PathParam("id") Long id, CompanyDetailDTO dto) {
-      CompanyEntity oldEntity = companyLogic.getCompany(id);
-        dto.setId(id);
-        oldEntity = dto.toEntity();
-        return new CompanyDetailDTO(companyLogic.updateCompany(oldEntity));
+        CompanyEntity entity = dto.toEntity();
+        entity.setId(id);
+        return new CompanyDetailDTO(companyLogic.updateCompany(entity));
     }
 
     /**

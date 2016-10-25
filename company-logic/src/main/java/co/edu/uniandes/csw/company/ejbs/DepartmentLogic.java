@@ -108,7 +108,7 @@ public class DepartmentLogic implements IDepartmentLogic {
     public DepartmentEntity createDepartment(Long companyid, DepartmentEntity entity) throws BusinessLogicException {
         DepartmentEntity alreadyExist = getDepartmentByName(companyid, entity.getName());
         if (alreadyExist != null) {
-            throw new BusinessLogicException("Ya existe un departamento con ese nombre en la compañía ");
+            throw new BusinessLogicException("Ya existe un departamento con ese nombre en la misma compañía ");
         } else {
             CompanyEntity  company = companyLogic.getCompany(companyid);
             entity.setCompany(company);

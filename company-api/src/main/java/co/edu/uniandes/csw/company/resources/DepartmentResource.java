@@ -44,7 +44,7 @@ import javax.ws.rs.WebApplicationException;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Path("{companyId: \\d+}/departments")
+@Path("/companies/{companyId: \\d+}/departments")
 public class DepartmentResource {
 
     @Inject
