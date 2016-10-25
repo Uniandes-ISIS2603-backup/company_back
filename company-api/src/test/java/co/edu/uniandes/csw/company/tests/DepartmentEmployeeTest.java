@@ -75,7 +75,7 @@ public class DepartmentEmployeeTest {
     private WebTarget target;
     private final String apiPath = "api";  
     private final String companyPath = "companies";
-    CompanyEntity fatherEntity;
+    CompanyEntity fatherCompanyEntity;
 
     @ArquillianResource
     private URL deploymentURL;
@@ -125,15 +125,15 @@ public class DepartmentEmployeeTest {
     public void insertData() {
         try{
             PodamFactory factory = new PodamFactoryImpl();
-            fatherEntity = factory.manufacturePojo(CompanyEntity.class);
-            fatherEntity.setId(1L);
+            fatherCompanyEntity = factory.manufacturePojo(CompanyEntity.class);
+            fatherCompanyEntity.setId(1L);
             utx.begin();
-            em.persist(fatherEntity);
+            em.persist(fatherCompanyEntity);
             utx.commit();
             for (int i = 0; i < 3; i++) {   
                 DepartmentEntity department = factory.manufacturePojo(DepartmentEntity.class);
                 department.setId(i + 1L);
-                department.setCompany(fatherEntity);
+                department.setCompany(fatherCompanyEntity);
                 utx.begin();
                 em.persist(department);
                 utx.commit();
@@ -169,7 +169,8 @@ public class DepartmentEmployeeTest {
      */
     @Before
     public void setUpTest() {
-        target = createWebTarget();
+         target = createWebTarget()
+                .path(companyPath);
         try {
             utx.begin();
             clearData();
@@ -198,7 +199,8 @@ public class DepartmentEmployeeTest {
         EmployeeDTO employees = new EmployeeDTO(oraculoEmployees.get(1));
         DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
 
-        Response response = target.path(departmentPath).path(department.getId().toString())
+        Response response = target.path(fatherCompanyEntity.getId().toString())
+                . path(departmentPath).path(department.getId().toString())
                 .path(employeesPath).path(employees.getId().toString())
                 .request()
                 .post(Entity.entity(employees, MediaType.APPLICATION_JSON));
@@ -218,7 +220,8 @@ public class DepartmentEmployeeTest {
    
         DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
 
-        Response response = target.path(departmentPath)
+        Response response = target.path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath)
                 .path(department.getId().toString())
                 .path(employeesPath)
                 .request().get();
@@ -240,7 +243,8 @@ public class DepartmentEmployeeTest {
         EmployeeDTO employees = new EmployeeDTO(oraculoEmployees.get(0));
         DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
 
-        EmployeeDTO employeesTest = target.path(departmentPath)
+        EmployeeDTO employeesTest = target.path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath)
                 .path(department.getId().toString()).path(employeesPath)
                 .path(employees.getId().toString())
                 .request().get(EmployeeDTO.class);
@@ -261,7 +265,8 @@ public class DepartmentEmployeeTest {
         EmployeeDTO employees = new EmployeeDTO(oraculoEmployees.get(0));
         DepartmentDTO department = new DepartmentDTO(oraculo.get(0));
 
-        Response response = target.path(departmentPath).path(department.getId().toString())
+        Response response = target.path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath).path(department.getId().toString())
                 .path(employeesPath).path(employees.getId().toString())
                 .request().delete();
         Assert.assertEquals(OkWithoutContent, response.getStatus());
