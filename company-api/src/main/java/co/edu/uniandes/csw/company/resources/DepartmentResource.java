@@ -49,7 +49,7 @@ import javax.ws.rs.WebApplicationException;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Path("/companies/{companyId: \\d+}/")
+@Path("/companies/{companyId: \\d+}/departments")
 public class DepartmentResource {
 
     private static final Logger LOGGER = Logger.getLogger(DepartmentResource.class.getName());
@@ -103,7 +103,6 @@ public class DepartmentResource {
      *
      */
     @GET
-    @Path("departments")
     public List<DepartmentDetailDTO> getDepartments() {
         existsCompany(companyId);
 
@@ -122,7 +121,7 @@ public class DepartmentResource {
      *
      */
     @GET
-    @Path("departments/{departmentId: \\d+}")
+    @Path("{departmentId: \\d+}")
     public DepartmentDetailDTO getDepartment(@PathParam("departmentId") Long departmentId) {
         existsCompany(companyId);
         LOGGER.log(Level.INFO, "Consultando company con companyId = {0}", companyId);
@@ -143,7 +142,6 @@ public class DepartmentResource {
      *
      */
     @POST
-    @Path("departments")
     public DepartmentDetailDTO createDepartment(DepartmentDetailDTO dto) throws BusinessLogicException {
         existsCompany(companyId);
         return new DepartmentDetailDTO(departmentLogic.createDepartment(companyId, dto.toEntity()));
@@ -159,7 +157,7 @@ public class DepartmentResource {
      *
      */
     @PUT
-    @Path("departments/{departmentId: \\d+}")
+    @Path("{departmentId: \\d+}")
     public DepartmentDetailDTO updateDepartment(@PathParam("departmentId") Long departmentId, DepartmentDetailDTO dto) {
         existsCompany(companyId);
         existsDepartment(departmentId);
@@ -177,7 +175,7 @@ public class DepartmentResource {
      *
      */
     @DELETE
-    @Path("departments/{departmentId: \\d+}")
+    @Path("{departmentId: \\d+}")
     public void deleteDepartment(@PathParam("departmentId") Long departmentId) {
 
         existsCompany(companyId);

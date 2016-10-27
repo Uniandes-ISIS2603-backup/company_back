@@ -44,7 +44,7 @@ import co.edu.uniandes.csw.company.entities.EmployeeEntity;
 import java.util.ArrayList;
 import javax.ws.rs.WebApplicationException;
 
-@Path("/companies/{companyId: \\d+}/departments/{departmentId: \\d+}/")
+@Path("/companies/{companyId: \\d+}/departments/{departmentId: \\d+}/employees")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class DepartmentEmployeeResource {
@@ -117,7 +117,6 @@ public class DepartmentEmployeeResource {
      *
      */
     @GET
-    @Path("employees")
     public List<EmployeeDetailDTO> listEmployees() {
         existsCompany(companyId);
         existsDepartment(departmentId);
@@ -133,7 +132,7 @@ public class DepartmentEmployeeResource {
      *
      */
     @GET
-    @Path("employees/{employeeId: \\d+}")
+    @Path("{employeeId: \\d+}")
     public EmployeeDetailDTO getEmployees(@PathParam("employeeId") Long employeeId) {
         existsCompany(companyId);
         existsDepartment(departmentId);
@@ -149,7 +148,6 @@ public class DepartmentEmployeeResource {
      *
      */
     @POST
-    @Path("employees")
     public EmployeeDetailDTO addEmployee(EmployeeDetailDTO employee) {
         existsCompany(companyId);
         existsDepartment(departmentId);
@@ -173,7 +171,6 @@ public class DepartmentEmployeeResource {
      *
      */
     @PUT
-    @Path("employees")
     public List<EmployeeDetailDTO> replaceEmployees(List<EmployeeDetailDTO> employees) {
         existsCompany(companyId);
         existsDepartment(departmentId);
@@ -188,7 +185,7 @@ public class DepartmentEmployeeResource {
      *
      */
     @DELETE
-    @Path("employees/{employeeId: \\d+}")
+    @Path("{employeeId: \\d+}")
     public void removeEmployee(@PathParam("employeeId") Long employeeId) {
         existsCompany(companyId);
         existsDepartment(departmentId);
