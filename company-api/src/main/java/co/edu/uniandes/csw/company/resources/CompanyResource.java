@@ -41,6 +41,7 @@ import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
 import java.util.ArrayList;
 import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 
 @Path("/companies")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -102,7 +103,12 @@ public class CompanyResource {
     @GET
     @Path("/name")
     public CompanyDetailDTO getCompanyByName(@QueryParam("name") String name) {
-        return new CompanyDetailDTO(companyLogic.getCompanyByName(name));
+        CompanyEntity companyE = companyLogic.getCompanyByName(name);
+        if (companyE == null) {
+            throw new WebApplicationException("La compañía no existe", 404);
+        } else {
+            return new CompanyDetailDTO(companyE);
+        }
     }
 
     /**

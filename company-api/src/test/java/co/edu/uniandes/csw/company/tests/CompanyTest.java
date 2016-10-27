@@ -26,6 +26,7 @@ package co.edu.uniandes.csw.company.tests;
 
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import co.edu.uniandes.csw.company.dtos.CompanyDTO;
+import co.edu.uniandes.csw.company.dtos.CompanyDetailDTO;
 import co.edu.uniandes.csw.company.resources.CompanyResource;
 
 import java.io.File;
@@ -135,7 +136,7 @@ public class CompanyTest {
      */
     @Before
     public void setUpTest() {
-        target = createWebTarget();
+        
         try {
             utx.begin();
             clearData();
@@ -149,6 +150,7 @@ public class CompanyTest {
                 e1.printStackTrace();
             }
         }
+        target = createWebTarget().path(companyPath);
     }
 
     /**
@@ -159,13 +161,14 @@ public class CompanyTest {
     @Test
     public void createCompanyTest() throws IOException {
         PodamFactory factory = new PodamFactoryImpl();
-        CompanyDTO company = factory.manufacturePojo(CompanyDTO.class);
+        CompanyDetailDTO company = factory.manufacturePojo(CompanyDetailDTO.class);
  
-        Response response = target.path(companyPath)
+        Response response = target
             .request()
             .post(Entity.entity(company, MediaType.APPLICATION_JSON));
         
-        CompanyDTO  companyTest = (CompanyDTO) response.readEntity(CompanyDTO.class);
+        CompanyDetailDTO  companyTest = (CompanyDetailDTO) response.readEntity(CompanyDetailDTO.class);
+   
         Assert.assertEquals(company.getName(), companyTest.getName());
         Assert.assertEquals(Created, response.getStatus());
         CompanyEntity entity = em.find(CompanyEntity.class, companyTest.getId());
@@ -178,11 +181,10 @@ public class CompanyTest {
      * 
      */
     @Test
-    public void getCompanyById() {
-        
-        CompanyDTO companyTest = target.path(companyPath)
+    public void getCompanyById() {      
+        CompanyDetailDTO companyTest = target
                 .path(companyList.get(0).getId().toString())
-                .request().get(CompanyDTO.class);
+                .request().get(CompanyDetailDTO.class);
         
         Assert.assertEquals(companyTest.getName(), companyList.get(0).getName());
         Assert.assertEquals(companyTest.getId(), companyList.get(0).getId());
@@ -196,11 +198,11 @@ public class CompanyTest {
     @Test
     public void listCompanyTest() throws IOException {
        
-        Response response = target.path(companyPath)
+        Response response = target
                 .request().get();
         
         String listCompany = response.readEntity(String.class);
-        List<CompanyDTO> listCompanyTest = new ObjectMapper().readValue(listCompany, List.class);
+        List<CompanyDetailDTO> listCompanyTest = new ObjectMapper().readValue(listCompany, List.class);
         Assert.assertEquals(Ok, response.getStatus());
         Assert.assertEquals(3, listCompanyTest.size());
     }
@@ -213,14 +215,16 @@ public class CompanyTest {
     @Test
     public void updateCompanyTest() throws IOException {
        
-        CompanyDTO company = new CompanyDTO(companyList.get(0));
+        CompanyDetailDTO company = new CompanyDetailDTO(companyList.get(0));
         PodamFactory factory = new PodamFactoryImpl();
-        CompanyDTO companyChanged = factory.manufacturePojo(CompanyDTO.class);
+        CompanyDetailDTO companyChanged = factory.manufacturePojo(CompanyDetailDTO.class);
         company.setName(companyChanged.getName());
-        Response response = target.path(companyPath).path(company.getId().toString())
+ 
+        Response response = target
+                .path(company.getId().toString())
                 .request().put(Entity.entity(company, MediaType.APPLICATION_JSON));
         
-        CompanyDTO companyTest = (CompanyDTO) response.readEntity(CompanyDTO.class);
+        CompanyDetailDTO companyTest = (CompanyDetailDTO) response.readEntity(CompanyDetailDTO.class);
         Assert.assertEquals(Ok, response.getStatus());
         Assert.assertEquals(company.getName(), companyTest.getName());
     }
@@ -234,7 +238,8 @@ public class CompanyTest {
     public void deleteCompanyTest() {
       
         CompanyDTO company = new CompanyDTO(companyList.get(0));
-        Response response = target.path(companyPath).path(company.getId().toString())
+        Response response = target
+                .path(company.getId().toString())
                 .request().delete();
         
         Assert.assertEquals(OkWithoutContent, response.getStatus());
