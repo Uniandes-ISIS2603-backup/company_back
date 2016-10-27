@@ -38,6 +38,7 @@ public class CompanyDetailDTO extends CompanyDTO {
     public CompanyDetailDTO() {
         super();
     }
+    
 
     /**
      * Crea un objeto CompanyDetailDTO a partir de un objeto CompanyEntity

@@ -103,7 +103,7 @@ public class DepartmentResource {
      *
      */
     @GET
-     @Path("departments")
+    @Path("departments")
     public List<DepartmentDetailDTO> getDepartments() {
         existsCompany(companyId);
 
