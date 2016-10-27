@@ -31,13 +31,17 @@ import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import co.edu.uniandes.csw.company.entities.EmployeeEntity;
 import co.edu.uniandes.csw.company.api.IEmployeeLogic;
 import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
+import co.edu.uniandes.csw.company.persistence.CompanyPersistence;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.NoResultException;
 
 @Stateless
 public class DepartmentLogic implements IDepartmentLogic {
+      private static final Logger LOGGER = Logger.getLogger(DepartmentLogic.class.getName());
 
     @Inject
     private DepartmentPersistence persistence;
@@ -72,6 +76,7 @@ public class DepartmentLogic implements IDepartmentLogic {
      */
     @Override
     public DepartmentEntity getDepartment(Long departmentId) {
+        LOGGER.log(Level.INFO, "Consultando department con departmentId={0}", departmentId);
         try {
             return persistence.find(departmentId);
         } catch (NoResultException e) {

@@ -20,13 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 package co.edu.uniandes.csw.company.tests;
 
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
-import co.edu.uniandes.csw.company.dtos.DepartmentDTO;
+
 import co.edu.uniandes.csw.company.entities.DepartmentEntity;
 import co.edu.uniandes.csw.company.dtos.EmployeeDTO;
+import co.edu.uniandes.csw.company.dtos.EmployeeDetailDTO;
 import co.edu.uniandes.csw.company.entities.EmployeeEntity;
 import co.edu.uniandes.csw.company.resources.DepartmentResource;
 import java.io.File;
@@ -65,17 +66,20 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 @RunWith(Arquillian.class)
 public class DepartmentEmployeeTest {
 
-    private final int Ok = Status.OK.getStatusCode();
-    private final int Created = 200; // Status.CREATED.getStatusCode();
-    private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
-    private final String departmentPath = "departments";
-    private final static List<DepartmentEntity> departmentList = new ArrayList<>();
-    private final String employeesPath = "employees";
-    private final static List<EmployeeEntity> employeeList = new ArrayList<>();
     private WebTarget target;
-    private final String apiPath = "api";  
+    private PodamFactory factory = new PodamFactoryImpl();
+
+    private final int Ok = Status.OK.getStatusCode();
+    private final int OkWithoutContent = Status.NO_CONTENT.getStatusCode();
+
+    private final static List<EmployeeEntity> employeeList = new ArrayList<>();
+    private final String apiPath = "api";
     private final String companyPath = "companies";
-    CompanyEntity fatherCompanyEntity;
+    private final String departmentPath = "departments";
+    private final String employeesPath = "employees";
+
+    private CompanyEntity fatherCompanyEntity;
+    private DepartmentEntity fatherDepartmentEntity;
 
     @ArquillianResource
     private URL deploymentURL;
@@ -93,7 +97,7 @@ public class DepartmentEmployeeTest {
                 .addAsResource("META-INF/persistence.xml", "META-INF/persistence.xml")
                 // El archivo beans.xml es necesario para injeccion de dependencias.
                 .addAsWebInfResource(new File("src/main/webapp/WEB-INF/beans.xml"))
-                 // El archivo web.xml es necesario para el despliegue de los servlets
+                // El archivo web.xml es necesario para el despliegue de los servlets
                 .setWebXML(new File("src/main/webapp/WEB-INF/web.xml"));
     }
 
@@ -108,74 +112,49 @@ public class DepartmentEmployeeTest {
     private UserTransaction utx;
 
     private void clearData() {
-        em.createQuery("delete from EmployeeEntity").executeUpdate();
-        em.createQuery("delete from CompanyEntity").executeUpdate();
+        List<EmployeeEntity> records = em.createQuery("SELECT u FROM EmployeeEntity u").getResultList();
+        for (EmployeeEntity record : records) {
+            em.remove(record);
+        }
         em.createQuery("delete from DepartmentEntity").executeUpdate();
+        em.createQuery("delete from CompanyEntity").executeUpdate();
+        
         employeeList.clear();
-        departmentList.clear();
+        
     }
-
-  
-
-   /**
-     * Datos iniciales para el correcto funcionamiento de las pruebas.
-     *
-     * 
-     */
-    public void insertData() {
-        try{
-            PodamFactory factory = new PodamFactoryImpl();
-            fatherCompanyEntity = factory.manufacturePojo(CompanyEntity.class);
-            fatherCompanyEntity.setId(1L);
-            utx.begin();
-            em.persist(fatherCompanyEntity);
-            utx.commit();
-            for (int i = 0; i < 3; i++) {   
-                DepartmentEntity department = factory.manufacturePojo(DepartmentEntity.class);
-                department.setId(i + 1L);
-                department.setCompany(fatherCompanyEntity);
-                utx.begin();
-                em.persist(department);
-                utx.commit();
-                departmentList.add(department);
-
-                EmployeeEntity employees = factory.manufacturePojo(EmployeeEntity.class);
-                employees.setId(i + 1L);
-                employees.setDepartment(department);    
-                utx.begin();
-                em.persist(employees);
-                utx.commit();
-                employeeList.add(employees);                     
-                
-                
-            }
-            } catch (Exception e) {
-                e.printStackTrace();
-                try {
-                    utx.rollback();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-    }
-
-  
-
 
     /**
+     * Datos iniciales para el correcto funcionamiento de las pruebas.
+     *
+     */
+    private void insertData() {
+        fatherCompanyEntity = factory.manufacturePojo(CompanyEntity.class);
+        em.persist(fatherCompanyEntity);
+        fatherDepartmentEntity = factory.manufacturePojo(DepartmentEntity.class);
+        fatherDepartmentEntity.setCompany(fatherCompanyEntity);
+        em.persist(fatherDepartmentEntity);
+
+        for (int i = 0; i < 3; i++) {
+            EmployeeEntity employees = factory.manufacturePojo(EmployeeEntity.class);
+            em.persist(employees);
+            if (i < 2) {
+                employees.setDepartment(fatherDepartmentEntity);
+            }
+            employeeList.add(employees);
+        }
+    }
+/**
      * Configuración inicial de la prueba.
      *
-     * 
+     * @generated
      */
     @Before
     public void setUpTest() {
-         target = createWebTarget()
-                .path(companyPath);
         try {
             utx.begin();
             clearData();
-            utx.commit();
-            insertData();            
+            insertData();
+            utx.commit();            
         } catch (Exception e) {
             e.printStackTrace();
             try {
@@ -184,66 +163,63 @@ public class DepartmentEmployeeTest {
                 e1.printStackTrace();
             }
         }
+        target = createWebTarget()
+                .path(companyPath)
+                .path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath)
+                .path(fatherDepartmentEntity.getId().toString())
+                .path(employeesPath);
     }
-
-    
     /**
-     *Prueba para asociar un Employees existente a un Department
+     * Prueba para asociar un Employees existente a un Department
      *
-     * 
+     *
      */
     @Test
-    public void addEmployeesTest() {      
-        EmployeeDTO employees = new EmployeeDTO(employeeList.get(1));
-        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
+    public void addEmployeesTest() {
+        EmployeeDetailDTO employee = new EmployeeDetailDTO(employeeList.get(1));
+       
 
-        Response response = target.path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath).path(department.getId().toString())
-                .path(employeesPath).path(employees.getId().toString())
+        Response response = target
                 .request()
-                .post(Entity.entity(employees, MediaType.APPLICATION_JSON));
+                .post(Entity.entity(employee, MediaType.APPLICATION_JSON));
 
-        EmployeeDTO employeesTest = (EmployeeDTO) response.readEntity(EmployeeDTO.class);
+        EmployeeDetailDTO employeesTest = (EmployeeDetailDTO) response.readEntity(EmployeeDetailDTO.class);
         Assert.assertEquals(Ok, response.getStatus());
-        Assert.assertEquals(employees.getId(), employeesTest.getId());
+        Assert.assertEquals(employee.getId(), employeesTest.getId());
     }
 
     /**
-     * Prueba para obtener una colección de instancias de Employees asociadas a una instancia Department
+     * Prueba para obtener una colección de instancias de Employees asociadas a
+     * una instancia Department
      *
-     * 
+     *
      */
     @Test
     public void listEmployeesTest() throws IOException {
-   
-        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
 
-        Response response = target.path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath)
-                .path(department.getId().toString())
-                .path(employeesPath)
+         Response response = target
                 .request().get();
 
         String employeesList = response.readEntity(String.class);
         List<EmployeeDTO> employeesListTest = new ObjectMapper().readValue(employeesList, List.class);
         Assert.assertEquals(Ok, response.getStatus());
-        Assert.assertEquals(1, employeesListTest.size());
+        Assert.assertEquals(2, employeesListTest.size());
     }
 
     /**
-     * Prueba para obtener una instancia de Employees asociada a una instancia Department
+     * Prueba para obtener una instancia de Employees asociada a una instancia
+     * Department
      *
-     * 
+     *
      */
     @Test
     public void getEmployeesTest() throws IOException {
-      
-        EmployeeDTO employees = new EmployeeDTO(employeeList.get(0));
-        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
 
-        EmployeeDTO employeesTest = target.path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath)
-                .path(department.getId().toString()).path(employeesPath)
+        EmployeeDTO employees = new EmployeeDTO(employeeList.get(0));
+      
+
+        EmployeeDTO employeesTest = target
                 .path(employees.getId().toString())
                 .request().get(EmployeeDTO.class);
 
@@ -255,18 +231,18 @@ public class DepartmentEmployeeTest {
     /**
      * Prueba para desasociar un Employees existente de un Department existente
      *
-     * 
+     *
      */
     @Test
     public void removeEmployeesTest() {
-    
-        EmployeeDTO employees = new EmployeeDTO(employeeList.get(0));
-        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
 
-        Response response = target.path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath).path(department.getId().toString())
-                .path(employeesPath).path(employees.getId().toString())
+        EmployeeDTO employees = new EmployeeDTO(employeeList.get(0));
+        
+
+        Response response = target
+               .path(employees.getId().toString())
                 .request().delete();
+
         Assert.assertEquals(OkWithoutContent, response.getStatus());
     }
 }

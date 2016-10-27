@@ -26,6 +26,7 @@ package co.edu.uniandes.csw.company.tests;
 import co.edu.uniandes.csw.company.entities.DepartmentEntity;
 import co.edu.uniandes.csw.company.entities.CompanyEntity;
 import co.edu.uniandes.csw.company.dtos.DepartmentDTO;
+import co.edu.uniandes.csw.company.dtos.DepartmentDetailDTO;
 import co.edu.uniandes.csw.company.resources.DepartmentResource;
 
 import java.io.File;
@@ -139,13 +140,9 @@ public class DepartmentTest {
 
     /**
      * Configuración inicial de la prueba.
-     *
-     * @generated
      */
     @Before
     public void setUpTest() {
-        target = createWebTarget()
-                .path(companyPath);
 
         try {
             utx.begin();
@@ -160,7 +157,10 @@ public class DepartmentTest {
                 e1.printStackTrace();
             }
         }
-
+        target = createWebTarget()
+                .path(companyPath)
+                .path(fatherCompanyEntity.getId().toString())
+                .path(departmentPath);
     }
 
     /**
@@ -170,15 +170,13 @@ public class DepartmentTest {
      */
     @Test
     public void createDepartmentTest() throws IOException {
-        DepartmentDTO department = factory.manufacturePojo(DepartmentDTO.class);
+        DepartmentDetailDTO department = factory.manufacturePojo(DepartmentDetailDTO.class);
 
         Response response = target
-                .path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath)
                 .request()
                 .post(Entity.entity(department, MediaType.APPLICATION_JSON));
 
-        DepartmentDTO departmentTest = (DepartmentDTO) response.readEntity(DepartmentDTO.class);
+        DepartmentDetailDTO departmentTest = (DepartmentDetailDTO) response.readEntity(DepartmentDetailDTO.class);
 
         Assert.assertEquals(Created, response.getStatus());
 
@@ -195,13 +193,10 @@ public class DepartmentTest {
      */
     @Test
     public void getDepartmentByIdTest() {
-        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
 
-        DepartmentDTO departmentTest = target
-                .path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath)
-                .path(department.getId().toString())
-                .request().get(DepartmentDTO.class);
+        DepartmentDetailDTO departmentTest = target
+                .path(departmentList.get(0).getId().toString())
+                .request().get(DepartmentDetailDTO.class);
 
         Assert.assertEquals(departmentTest.getId(), departmentList.get(0).getId());
         Assert.assertEquals(departmentTest.getName(), departmentList.get(0).getName());
@@ -216,8 +211,6 @@ public class DepartmentTest {
     public void listDepartmentTest() throws IOException {
 
         Response response = target
-                .path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath)
                 .request().get();
 
         String listDepartment = response.readEntity(String.class);
@@ -234,20 +227,18 @@ public class DepartmentTest {
     @Test
     public void updateDepartmentTest() throws IOException {
 
-        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
+        DepartmentDetailDTO department = new DepartmentDetailDTO(departmentList.get(0));
 
         DepartmentDTO departmentChanged = factory.manufacturePojo(DepartmentDTO.class);
 
         department.setName(departmentChanged.getName());
 
         Response response = target
-                .path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath)
                 .path(department.getId().toString())
                 .request()
                 .put(Entity.entity(department, MediaType.APPLICATION_JSON));
 
-        DepartmentDTO departmentTest = (DepartmentDTO) response.readEntity(DepartmentDTO.class);
+        DepartmentDetailDTO departmentTest = (DepartmentDetailDTO) response.readEntity(DepartmentDetailDTO.class);
 
         Assert.assertEquals(Ok, response.getStatus());
         Assert.assertEquals(department.getName(), departmentTest.getName());
@@ -260,12 +251,8 @@ public class DepartmentTest {
      */
     @Test
     public void deleteDepartmentTest() {
-
-        DepartmentDTO department = new DepartmentDTO(departmentList.get(0));
         Response response = target
-                .path(fatherCompanyEntity.getId().toString())
-                .path(departmentPath)
-                .path(department.getId().toString())
+                .path(departmentList.get(0).getId().toString())
                 .request().delete();
 
         Assert.assertEquals(OkWithoutContent, response.getStatus());

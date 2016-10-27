@@ -41,13 +41,18 @@ import co.edu.uniandes.csw.company.dtos.CompanyDetailDTO;
 import co.edu.uniandes.csw.company.dtos.DepartmentDetailDTO;
 import co.edu.uniandes.csw.company.entities.DepartmentEntity;
 import co.edu.uniandes.csw.company.exceptions.BusinessLogicException;
+import co.edu.uniandes.csw.company.persistence.CompanyPersistence;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Path("/companies/{companyId: \\d+}/departments")
+@Path("/companies/{companyId: \\d+}/")
 public class DepartmentResource {
+
+    private static final Logger LOGGER = Logger.getLogger(DepartmentResource.class.getName());
 
     @Inject
     private IDepartmentLogic departmentLogic;
@@ -77,7 +82,14 @@ public class DepartmentResource {
     public void existsCompany(Long companyId) {
         CompanyDetailDTO company = new CompanyDetailDTO(companyLogic.getCompany(companyId));
         if (company == null) {
-            throw new WebApplicationException(404);
+            throw new WebApplicationException("La compañía no existe", 404);
+        }
+    }
+
+    public void existsDepartment(Long departmentId) {
+        DepartmentDetailDTO department = new DepartmentDetailDTO(departmentLogic.getDepartment(departmentId));
+        if (department == null) {
+            throw new WebApplicationException("El Departamento no existe", 404);
         }
     }
 
@@ -93,7 +105,7 @@ public class DepartmentResource {
     @GET
     public List<DepartmentDetailDTO> getDepartments() {
         existsCompany(companyId);
-        
+
         List<DepartmentEntity> departments = departmentLogic.getDepartments(companyId);
 
         return listEntity2DTO(departments);
@@ -109,13 +121,16 @@ public class DepartmentResource {
      *
      */
     @GET
-    @Path("{departmentId: \\d+}")
+    @Path("departments/{departmentId: \\d+}")
     public DepartmentDetailDTO getDepartment(@PathParam("departmentId") Long departmentId) {
         existsCompany(companyId);
+        LOGGER.log(Level.INFO, "Consultando company con companyId = {0}", companyId);
         DepartmentEntity entity = departmentLogic.getDepartment(departmentId);
+        LOGGER.log(Level.INFO, "Consultando company con id = {0}", entity.getCompany().getId());
         if (entity.getCompany() != null && !companyId.equals(entity.getCompany().getId())) {
             throw new WebApplicationException(404);
         }
+
         return new DepartmentDetailDTO(entity);
     }
 
@@ -127,6 +142,7 @@ public class DepartmentResource {
      *
      */
     @POST
+    @Path("departments")
     public DepartmentDetailDTO createDepartment(DepartmentDetailDTO dto) throws BusinessLogicException {
         existsCompany(companyId);
         return new DepartmentDetailDTO(departmentLogic.createDepartment(companyId, dto.toEntity()));
@@ -142,9 +158,10 @@ public class DepartmentResource {
      *
      */
     @PUT
-    @Path("{departmentId: \\d+}")
+    @Path("departments/{departmentId: \\d+}")
     public DepartmentDetailDTO updateDepartment(@PathParam("departmentId") Long departmentId, DepartmentDetailDTO dto) {
         existsCompany(companyId);
+        existsDepartment(departmentId);
         DepartmentEntity entity = dto.toEntity();
         entity.setId(departmentId);
         DepartmentEntity oldEntity = departmentLogic.getDepartment(departmentId);
@@ -159,9 +176,11 @@ public class DepartmentResource {
      *
      */
     @DELETE
-    @Path("{departmentId: \\d+}")
+    @Path("departments/{departmentId: \\d+}")
     public void deleteDepartment(@PathParam("departmentId") Long departmentId) {
+
         existsCompany(companyId);
+        existsDepartment(departmentId);
         departmentLogic.deleteDepartment(departmentId);
     }
 

@@ -36,6 +36,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import co.edu.uniandes.csw.company.api.IDepartmentLogic;
+import co.edu.uniandes.csw.company.api.IEmployeeLogic;
 import co.edu.uniandes.csw.company.dtos.CompanyDetailDTO;
 import co.edu.uniandes.csw.company.dtos.DepartmentDetailDTO;
 import co.edu.uniandes.csw.company.dtos.EmployeeDetailDTO;
@@ -43,16 +44,24 @@ import co.edu.uniandes.csw.company.entities.EmployeeEntity;
 import java.util.ArrayList;
 import javax.ws.rs.WebApplicationException;
 
-@Path("/departments/{departmentId: \\d+}/")
+@Path("/companies/{companyId: \\d+}/departments/{departmentId: \\d+}/")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class DepartmentEmployeeResource {
+
+    @PathParam("companyId")
+    private Long companyId;
+    @PathParam("departmentId")
+    private Long departmentId;
 
     @Inject
     private IDepartmentLogic departmentLogic;
 
     @Inject
     private ICompanyLogic companyLogic;
+
+    @Inject
+    private IEmployeeLogic employeeLogic;
 
     /**
      * Convierte una lista de EmployeeEntity a una lista de EmployeeDetailDTO.
@@ -102,14 +111,14 @@ public class DepartmentEmployeeResource {
      * Obtiene una colección de instancias de EmployeeDetailDTO asociadas a una
      * instancia de Department
      *
-     * @param departmentId Identificador de la instancia de Department
+     * @Param departmentId Identificador de la instancia de Department
      * @return Colección de instancias de EmployeeDetailDTO asociadas a la
      * instancia de Department
      *
      */
     @GET
     @Path("employees")
-    public List<EmployeeDetailDTO> listEmployees(@PathParam("companyId") Long companyId, @PathParam("departmentId") Long departmentId) {
+    public List<EmployeeDetailDTO> listEmployees() {
         existsCompany(companyId);
         existsDepartment(departmentId);
         return employeesListEntity2DTO(departmentLogic.listEmployees(departmentId));
@@ -125,7 +134,7 @@ public class DepartmentEmployeeResource {
      */
     @GET
     @Path("employees/{employeeId: \\d+}")
-    public EmployeeDetailDTO getEmployees(@PathParam("companyId") Long companyId, @PathParam("departmentId") Long departmentId, @PathParam("employeeId") Long employeeId) {
+    public EmployeeDetailDTO getEmployees(@PathParam("employeeId") Long employeeId) {
         existsCompany(companyId);
         existsDepartment(departmentId);
         return new EmployeeDetailDTO(departmentLogic.getEmployee(departmentId, employeeId));
@@ -135,16 +144,21 @@ public class DepartmentEmployeeResource {
      * Asocia un Employee existente a un Department
      *
      * @param departmentId Identificador de la instancia de Department
-     * @param employeeId Identificador de la instancia de Employee
+     * @param employee instancia de Employee
      * @return Instancia de EmployeeDetailDTO que fue asociada a Department
      *
      */
     @POST
-    @Path("employees/{employeeId: \\d+}")
-    public EmployeeDetailDTO addEmployees(@PathParam("companyId") Long companyId, @PathParam("departmentId") Long departmentId, @PathParam("employeeId") Long employeeId) {
+    @Path("employees")
+    public EmployeeDetailDTO addEmployee(EmployeeDetailDTO employee) {
         existsCompany(companyId);
         existsDepartment(departmentId);
-        return new EmployeeDetailDTO(departmentLogic.addEmployee(departmentId, employeeId));
+        EmployeeEntity emp = employeeLogic.getEmployee(employee.getId());
+        if (emp != null) {
+            return new EmployeeDetailDTO(departmentLogic.addEmployee(departmentId, emp.getId()));
+        } else {
+            throw new WebApplicationException(404);
+        }
     }
 
     /**
@@ -160,7 +174,7 @@ public class DepartmentEmployeeResource {
      */
     @PUT
     @Path("employees")
-    public List<EmployeeDetailDTO> replaceEmployees(@PathParam("companyId") Long companyId, @PathParam("departmentId") Long departmentId, List<EmployeeDetailDTO> employees) {
+    public List<EmployeeDetailDTO> replaceEmployees(List<EmployeeDetailDTO> employees) {
         existsCompany(companyId);
         existsDepartment(departmentId);
         return employeesListEntity2DTO(departmentLogic.replaceEmployees(departmentId, employeesListDTO2Entity(employees)));
@@ -175,9 +189,15 @@ public class DepartmentEmployeeResource {
      */
     @DELETE
     @Path("employees/{employeeId: \\d+}")
-    public void removeEmployees(@PathParam("companyId") Long companyId, @PathParam("departmentId") Long departmentId, @PathParam("employeeId") Long employeeId) {
+    public void removeEmployee(@PathParam("employeeId") Long employeeId) {
         existsCompany(companyId);
         existsDepartment(departmentId);
-        departmentLogic.removeEmployee(departmentId, employeeId);
+        EmployeeEntity emp = employeeLogic.getEmployee(employeeId);
+        if (emp != null) {
+            departmentLogic.removeEmployee(departmentId, employeeId);
+        } else {
+            throw new WebApplicationException(404);
+        }
+
     }
 }
